@@ -27,11 +27,30 @@ const FilePath: FC<FilePathProps> = ({ className, label = 'PATH', paths = '', ur
     })();
   }, [url, paths]);
 
+  const downloadFile = () => {
+    // Fetch the file from the URL
+    fetch(filePath)
+      .then(response => response.blob())
+      .then(blob => {
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.style.display = 'none';
+        a.href = url;
+        a.download = 'downloaded_file';
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+      })
+      .catch(error => {
+        console.error('Error fetching file:', error);
+      });
+  };
+
   return (
     <div className={clsx(className, 'chat-file-path')}>
       <div>
         {label}:{' '}
-        <a onClick={() => shell.open(filePath)} title={filePath}>
+        <a onClick={downloadFile} title={filePath}>
           {content ? content : filePath}
         </a>
       </div>
